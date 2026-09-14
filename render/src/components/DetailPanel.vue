@@ -141,17 +141,41 @@ import css from 'highlight.js/lib/languages/css'
 import json from 'highlight.js/lib/languages/json'
 import sql from 'highlight.js/lib/languages/sql'
 import bash from 'highlight.js/lib/languages/bash'
+import java from 'highlight.js/lib/languages/java'
+import c from 'highlight.js/lib/languages/c'
+import cpp from 'highlight.js/lib/languages/cpp'
+import csharp from 'highlight.js/lib/languages/csharp'
+import go from 'highlight.js/lib/languages/go'
+import rust from 'highlight.js/lib/languages/rust'
+import ruby from 'highlight.js/lib/languages/ruby'
+import php from 'highlight.js/lib/languages/php'
+import kotlin from 'highlight.js/lib/languages/kotlin'
+import swift from 'highlight.js/lib/languages/swift'
+import yaml from 'highlight.js/lib/languages/yaml'
+import markdown from 'highlight.js/lib/languages/markdown'
 import 'highlight.js/styles/atom-one-dark.css'
 
 for (const [name, lang] of Object.entries({
   javascript,
   typescript,
   python,
+  java,
   xml,
   css,
   json,
   sql,
-  bash
+  bash,
+  c,
+  cpp,
+  csharp,
+  go,
+  rust,
+  ruby,
+  php,
+  kotlin,
+  swift,
+  yaml,
+  markdown,
 })) {
   hljs.registerLanguage(name, lang)
 }
@@ -165,6 +189,7 @@ const HIGHLIGHT_EXTS = {
   ts: 'typescript',
   tsx: 'typescript',
   py: 'python',
+  java: 'java',
   html: 'xml',
   htm: 'xml',
   xml: 'xml',
@@ -173,7 +198,26 @@ const HIGHLIGHT_EXTS = {
   json: 'json',
   sql: 'sql',
   sh: 'bash',
-  bash: 'bash'
+  bash: 'bash',
+  c: 'c',
+  h: 'c',
+  cc: 'cpp',
+  cpp: 'cpp',
+  cxx: 'cpp',
+  hpp: 'cpp',
+  hxx: 'cpp',
+  cs: 'csharp',
+  go: 'go',
+  rs: 'rust',
+  rb: 'ruby',
+  php: 'php',
+  kt: 'kotlin',
+  kts: 'kotlin',
+  swift: 'swift',
+  yml: 'yaml',
+  yaml: 'yaml',
+  md: 'markdown',
+  markdown: 'markdown',
 }
 
 function escapeHtml(s) {
