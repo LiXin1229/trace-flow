@@ -1,0 +1,351 @@
+{
+  "projectRoot": "d:/Projects/AI-skills/trace-flow",
+  "nodes": [
+  {
+    "id": "1",
+    "name": "init",
+    "filepath": "examples/frontend/detail.js",
+    "line": "#L19-L30",
+    "oneLineSummary": "详情页初始化入口：调用 loadDetail 加载作业详情，加载失败时通过 showMsg 展示错误提示",
+    "snippetIntents": [
+      {
+        "content": "调用 loadDetail 加载作业详情数据（请求详情接口并渲染统计信息）",
+        "line": "#L21",
+        "associatedId": "2",
+        "associatedType": "call",
+        "associatedRequired": true
+      },
+      {
+        "content": "加载成功后（模块级标记 detailLoaded 为 true）直接返回，结束初始化流程",
+        "line": "#L22",
+        "associatedId": null,
+        "associatedType": null,
+        "associatedRequired": false
+      },
+      {
+        "content": "异常兜底：调用 showMsg 在提示区展示错误信息（优先 err.message，否则提示「加载失败，请确认后端已启动后刷新重试」）",
+        "line": "#L24-L28",
+        "associatedId": "3",
+        "associatedType": "call",
+        "associatedRequired": false
+      }
+    ]
+  },
+  {
+    "id": "2",
+    "name": "loadDetail",
+    "filepath": "examples/frontend/detail.js",
+    "line": "#L6-L17",
+    "oneLineSummary": "加载作业详情：请求详情接口，失败时提示错误，成功后标记加载完成并渲染统计信息",
+    "snippetIntents": [
+      {
+        "content": "调用 apiRequest 请求 GET /api/homework/detail?homework_id=... 获取作业详情，并使用返回的 res",
+        "line": "#L7",
+        "associatedId": "4",
+        "associatedType": "return",
+        "associatedRequired": true
+      },
+      {
+        "content": "非 200 时调用 showMsg 展示后端返回的错误信息并直接返回",
+        "line": "#L8-L11",
+        "associatedId": "3",
+        "associatedType": "call",
+        "associatedRequired": false
+      },
+      {
+        "content": "设置模块级标记 detailLoaded = true，表示详情加载成功",
+        "line": "#L13",
+        "associatedId": null,
+        "associatedType": null,
+        "associatedRequired": false
+      },
+      {
+        "content": "将统计信息渲染到 statsText（总题数 / 对 / 半对 / 错）",
+        "line": "#L15-L16",
+        "associatedId": null,
+        "associatedType": null,
+        "associatedRequired": false
+      }
+    ]
+  },
+  {
+    "id": "3",
+    "name": "showMsg",
+    "filepath": "examples/frontend/ui.js",
+    "line": "#L1-L4",
+    "oneLineSummary": "通用的提示消息展示函数：设置提示元素文本并按类型设置样式类",
+    "snippetIntents": [
+      {
+        "content": "设置提示元素的文本内容",
+        "line": "#L2",
+        "associatedId": null,
+        "associatedType": null,
+        "associatedRequired": false
+      },
+      {
+        "content": "根据类型（error/success 等）拼接样式类名并赋给元素",
+        "line": "#L3",
+        "associatedId": null,
+        "associatedType": null,
+        "associatedRequired": false
+      }
+    ]
+  },
+  {
+    "id": "4",
+    "name": "apiRequest",
+    "filepath": "examples/frontend/http.js",
+    "line": "#L3-L23",
+    "oneLineSummary": "通用请求封装：合并请求头并发送 fetch，解析 JSON 响应后返回，连接失败或响应异常时抛出错误",
+    "snippetIntents": [
+      {
+        "content": "合并传入的请求头，若未指定 Content-Type 且 body 非 FormData，则默认设为 application/json",
+        "line": "#L4-L7",
+        "associatedId": null,
+        "associatedType": null,
+        "associatedRequired": false
+      },
+      {
+        "content": "调用 fetch 发送请求（路径为 API_BASE + path），间接触发后端 GET /api/homework/detail 路由；连接失败时抛出「无法连接后端服务」错误",
+        "line": "#L9-L14",
+        "associatedId": "5",
+        "associatedType": "indirect",
+        "associatedRequired": true
+      },
+      {
+        "content": "解析响应 JSON，解析失败时抛出「服务器响应异常」错误",
+        "line": "#L15-L20",
+        "associatedId": null,
+        "associatedType": null,
+        "associatedRequired": false
+      },
+      {
+        "content": "返回解析后的 JSON 数据",
+        "line": "#L22",
+        "associatedId": null,
+        "associatedType": null,
+        "associatedRequired": false
+      }
+    ]
+  },
+  {
+    "id": "5",
+    "name": "homework_detail",
+    "filepath": "examples/backend/homework.py",
+    "line": "#L13-L22",
+    "oneLineSummary": "GET /api/homework/detail 路由处理：鉴权并获取数据库会话后调用 HomeworkService.get_detail 获取详情，成功返回 success，异常返回 fail",
+    "snippetIntents": [
+      {
+        "content": "路由定义：GET /api/homework/detail，接收 homework_id 参数",
+        "line": "#L13-L15",
+        "associatedId": null,
+        "associatedType": null,
+        "associatedRequired": false
+      },
+      {
+        "content": "依赖注入 get_current_user 进行 JWT 鉴权",
+        "line": "#L16",
+        "associatedId": "8",
+        "associatedType": "indirect",
+        "associatedRequired": false
+      },
+      {
+        "content": "依赖注入 get_db 获取数据库会话",
+        "line": "#L17",
+        "associatedId": "9",
+        "associatedType": "indirect",
+        "associatedRequired": false
+      },
+      {
+        "content": "调用 HomeworkService(db).get_detail 获取作业详情",
+        "line": "#L20",
+        "associatedId": "6",
+        "associatedType": "return",
+        "associatedRequired": true
+      },
+      {
+        "content": "调用 success 将详情数据包装为成功响应返回",
+        "line": "#L20",
+        "associatedId": "10",
+        "associatedType": "return",
+        "associatedRequired": false
+      },
+      {
+        "content": "捕获 ApiException 并用 fail 返回错误信息",
+        "line": "#L21-L22",
+        "associatedId": "11",
+        "associatedType": "call",
+        "associatedRequired": false
+      }
+    ]
+  },
+  {
+    "id": "6",
+    "name": "HomeworkService.get_detail",
+    "filepath": "examples/backend/homework_service.py",
+    "line": "#L22-L48",
+    "oneLineSummary": "作业详情核心业务逻辑：获取作业记录（含鉴权），查询关联题目，组装包含统计信息和题目列表的详情字典返回",
+    "snippetIntents": [
+      {
+        "content": "调用 get_for_user 获取作业记录（含权限校验）",
+        "line": "#L23",
+        "associatedId": "7",
+        "associatedType": "return",
+        "associatedRequired": true
+      },
+      {
+        "content": "查询 Question 表，按 homework_id 过滤并按 id 排序获取题目列表",
+        "line": "#L24-L29",
+        "associatedId": "9",
+        "associatedType": "indirect",
+        "associatedRequired": true
+      },
+      {
+        "content": "组装详情字典：作业基本字段 + 统计信息（total/correct/half/wrong）+ 题目列表（id/ocr_text/answer/result）",
+        "line": "#L30-L48",
+        "associatedId": null,
+        "associatedType": null,
+        "associatedRequired": false
+      }
+    ]
+  },
+  {
+    "id": "7",
+    "name": "HomeworkService.get_for_user",
+    "filepath": "examples/backend/homework_service.py",
+    "line": "#L14-L20",
+    "oneLineSummary": "获取作业记录并做权限校验：作业不存在抛异常，非管理员且非本人作业则拒绝访问",
+    "snippetIntents": [
+      {
+        "content": "通过 db.get(Homework, homework_id) 查询作业记录",
+        "line": "#L15",
+        "associatedId": "9",
+        "associatedType": "indirect",
+        "associatedRequired": true
+      },
+      {
+        "content": "作业不存在时抛出 ApiException(\"作业不存在\", 500)",
+        "line": "#L16-L17",
+        "associatedId": "12",
+        "associatedType": "call",
+        "associatedRequired": false
+      },
+      {
+        "content": "非管理员且非本人作业时抛出 ApiException(\"无权限访问该作业\", 403)",
+        "line": "#L18-L19",
+        "associatedId": "12",
+        "associatedType": "call",
+        "associatedRequired": false
+      },
+      {
+        "content": "返回 homework 记录",
+        "line": "#L20",
+        "associatedId": null,
+        "associatedType": null,
+        "associatedRequired": false
+      }
+    ]
+  },
+  {
+    "id": "8",
+    "name": "get_current_user",
+    "filepath": "examples/backend/deps.py",
+    "line": "#L19-L34",
+    "oneLineSummary": "JWT 鉴权依赖：解析 Authorization 头中的 Bearer token，解码后构造 CurrentUser 返回",
+    "snippetIntents": [
+      {
+        "content": "校验 Authorization 头存在且为 Bearer 前缀，否则抛出 ApiException(\"未授权，请先登录\", 401)",
+        "line": "#L21-L22",
+        "associatedId": "12",
+        "associatedType": "call",
+        "associatedRequired": false
+      },
+      {
+        "content": "提取 token 并调用 jwt.decode 解码，失败时抛出 ApiException(\"令牌无效或已过期\", 401)",
+        "line": "#L24-L28",
+        "associatedId": "12",
+        "associatedType": "call",
+        "associatedRequired": false
+      },
+      {
+        "content": "构造 CurrentUser 数据对象（id/username/role）并返回",
+        "line": "#L30-L33",
+        "associatedId": null,
+        "associatedType": null,
+        "associatedRequired": false
+      }
+    ]
+  },
+  {
+    "id": "9",
+    "name": "get_db",
+    "filepath": "examples/backend/models.py",
+    "line": "#L37-L42",
+    "oneLineSummary": "数据库会话依赖：创建 SQLAlchemy Session 并在请求结束后关闭",
+    "snippetIntents": [
+      {
+        "content": "创建数据库会话 SessionLocal()",
+        "line": "#L38",
+        "associatedId": null,
+        "associatedType": null,
+        "associatedRequired": false
+      },
+      {
+        "content": "yield 会话，请求结束后在 finally 中关闭 db.close()",
+        "line": "#L39-L41",
+        "associatedId": null,
+        "associatedType": null,
+        "associatedRequired": false
+      }
+    ]
+  },
+  {
+    "id": "10",
+    "name": "success",
+    "filepath": "examples/backend/response.py",
+    "line": "#L6-L10",
+    "oneLineSummary": "成功响应封装：返回 JSONResponse，body 为 {code:200, msg, data}",
+    "snippetIntents": [
+      {
+        "content": "构造 JSONResponse，status_code=200，content 为 {code:200, msg, data}",
+        "line": "#L7-L9",
+        "associatedId": null,
+        "associatedType": null,
+        "associatedRequired": false
+      }
+    ]
+  },
+  {
+    "id": "11",
+    "name": "fail",
+    "filepath": "examples/backend/response.py",
+    "line": "#L13-L16",
+    "oneLineSummary": "失败响应封装：返回 JSONResponse，body 为 {code, msg, data}",
+    "snippetIntents": [
+      {
+        "content": "构造 JSONResponse，status_code=200，content 为 {code, msg, data}",
+        "line": "#L14-L16",
+        "associatedId": null,
+        "associatedType": null,
+        "associatedRequired": false
+      }
+    ]
+  },
+  {
+    "id": "12",
+    "name": "ApiException",
+    "filepath": "examples/backend/exceptions.py",
+    "line": "#L1-L5",
+    "oneLineSummary": "自定义 API 异常类，携带 msg 和 code 用于业务错误响应",
+    "snippetIntents": [
+      {
+        "content": "初始化 msg 和 code 并调用父类 __init__",
+        "line": "#L2-L4",
+        "associatedId": null,
+        "associatedType": null,
+        "associatedRequired": false
+      }
+    ]
+  }
+  ]
+}
