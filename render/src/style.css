@@ -273,6 +273,10 @@ body {
   min-height: 0;
 }
 
+.main.main-bottom {
+  flex-direction: column;
+}
+
 .tree-area {
   flex: 1;
   min-width: 0;

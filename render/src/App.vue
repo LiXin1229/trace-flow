@@ -41,10 +41,18 @@
       <button
         class="btn-load toggle"
         :class="{ active: hideNonRequired }"
-        :title="hideNonRequired ? '显示 associatedRequired 为 false 的节点' : '隐藏 associatedRequired 为 false 的节点'"
+        :title="hideNonRequired ? '当前仅显示关键代码，点击显示全部节点' : '当前显示全部节点，点击仅显示关键代码'"
         @click="hideNonRequired = !hideNonRequired"
       >
-        {{ hideNonRequired ? '显示全部' : '仅显示关键代码' }}
+        {{ hideNonRequired ? '仅显示关键代码' : '显示全部代码' }}
+      </button>
+
+      <button
+        class="btn-load"
+        :title="panelButtonTitle"
+        @click="cyclePanelState"
+      >
+        {{ panelButtonLabel }}
       </button>
 
       <label class="btn-load">
@@ -53,7 +61,7 @@
       </label>
     </header>
 
-    <main class="main">
+    <main class="main" :class="{ 'main-bottom': panelPosition === 'bottom' }">
       <section class="tree-area">
         <TraceTree
           v-if="graph"
@@ -74,10 +82,12 @@
       </section>
 
       <DetailPanel
+        v-show="!panelHidden"
         :node="selectedNode"
         :graph="graph"
         :hide-non-required="hideNonRequired"
         :json-file="currentFile"
+        :position="panelPosition"
         @jump="onJump"
       />
     </main>
@@ -96,6 +106,31 @@ const selectedId = ref(null)
 const query = ref('')
 const treeRef = ref(null)
 const hideNonRequired = ref(false)
+const panelPosition = ref('right')
+const panelHidden = ref(false)
+
+function cyclePanelState() {
+  if (panelHidden.value) {
+    panelHidden.value = false
+    panelPosition.value = 'right'
+  } else if (panelPosition.value === 'right') {
+    panelPosition.value = 'bottom'
+  } else {
+    panelHidden.value = true
+  }
+}
+
+const panelButtonLabel = computed(() => {
+  if (panelHidden.value) return '隐藏面板'
+  return panelPosition.value === 'right' ? '右侧面板' : '底部面板'
+})
+
+const panelButtonTitle = computed(() => {
+  if (panelHidden.value) return '当前面板已隐藏，点击恢复到右侧显示'
+  return panelPosition.value === 'right'
+    ? '当前面板在右侧，点击移动到底部'
+    : '当前面板在底部，点击隐藏'
+})
 
 // 数据文件列表（来自 /api/datalist，运行时获取：分析完成后写入 data/ 的新文件无需重启即可见）
 const dataFiles = ref([])
@@ -184,11 +219,13 @@ watch(graph, () => {
 
 function onSelect(id) {
   selectedId.value = String(id)
+  panelHidden.value = false
 }
 
 function onJump(id) {
   const target = String(id)
   selectedId.value = target
+  panelHidden.value = false
   treeRef.value?.reveal(target)
 }
 

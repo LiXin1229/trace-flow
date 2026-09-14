@@ -1,6 +1,16 @@
 <template>
-  <aside class="panel" :style="{ width: width + 'px' }">
-    <div class="resize-handle" @mousedown="startDrag" @dblclick="resetWidth" title="拖动调整宽度（双击重置）"></div>
+  <aside
+    class="panel"
+    :class="{ bottom: isBottom }"
+    :style="isBottom ? { height: height + 'px' } : { width: width + 'px' }"
+  >
+    <div
+      class="resize-handle"
+      :class="isBottom ? 'resize-handle-top' : 'resize-handle-left'"
+      :title="isBottom ? '拖动调整高度（双击重置）' : '拖动调整宽度（双击重置）'"
+      @mousedown="startDrag"
+      @dblclick="resetSize"
+    ></div>
     <template v-if="node">
       <div class="panel-body">
         <div class="source-pane" :class="{ collapsed: !showSource }">
@@ -264,16 +274,24 @@ const props = defineProps({
   node: { type: Object, default: null },
   graph: { type: Object, default: null },
   hideNonRequired: { type: Boolean, default: false },
-  jsonFile: { type: String, default: '' }
+  jsonFile: { type: String, default: '' },
+  position: { type: String, default: 'right' }
 })
 
 defineEmits(['jump'])
+
+const isBottom = computed(() => props.position === 'bottom')
 
 const DEFAULT_WIDTH = 760
 const MIN_WIDTH = 480
 const MAX_WIDTH_RATIO = 0.7
 
+const DEFAULT_HEIGHT = 360
+const MIN_HEIGHT = 200
+const MAX_HEIGHT_RATIO = 0.7
+
 const width = ref(DEFAULT_WIDTH)
+const height = ref(DEFAULT_HEIGHT)
 const dragging = ref(false)
 const showSource = ref(true)
 const showDetail = ref(true)
@@ -300,19 +318,37 @@ function clampWidth(w) {
   return Math.min(Math.max(w, MIN_WIDTH), max)
 }
 
+function clampHeight(h) {
+  const max = Math.max(MIN_HEIGHT, Math.floor(window.innerHeight * MAX_HEIGHT_RATIO))
+  return Math.min(Math.max(h, MIN_HEIGHT), max)
+}
+
 function startDrag(e) {
   e.preventDefault()
   dragging.value = true
-  const startX = e.clientX
-  const startWidth = width.value
   document.body.classList.add('panel-resizing')
 
-  const onMove = (ev) => {
-    width.value = clampWidth(startWidth + (startX - ev.clientX))
+  let onMove, onUp
+
+  if (isBottom.value) {
+    const startY = e.clientY
+    const startHeight = height.value
+    document.body.classList.add('panel-resizing-row')
+    onMove = (ev) => {
+      height.value = clampHeight(startHeight + (startY - ev.clientY))
+    }
+  } else {
+    const startX = e.clientX
+    const startWidth = width.value
+    document.body.classList.add('panel-resizing-col')
+    onMove = (ev) => {
+      width.value = clampWidth(startWidth + (startX - ev.clientX))
+    }
   }
-  const onUp = () => {
+
+  onUp = () => {
     dragging.value = false
-    document.body.classList.remove('panel-resizing')
+    document.body.classList.remove('panel-resizing', 'panel-resizing-col', 'panel-resizing-row')
     window.removeEventListener('mousemove', onMove)
     window.removeEventListener('mouseup', onUp)
   }
@@ -320,12 +356,13 @@ function startDrag(e) {
   window.addEventListener('mouseup', onUp)
 }
 
-function resetWidth() {
-  width.value = DEFAULT_WIDTH
+function resetSize() {
+  if (isBottom.value) height.value = DEFAULT_HEIGHT
+  else width.value = DEFAULT_WIDTH
 }
 
 onBeforeUnmount(() => {
-  document.body.classList.remove('panel-resizing')
+  document.body.classList.remove('panel-resizing', 'panel-resizing-col', 'panel-resizing-row')
   clearTimeout(copyTimer)
 })
 
@@ -512,14 +549,34 @@ function isHotLine(n) {
   overflow: hidden;
 }
 
+.panel.bottom {
+  width: 100%;
+  min-width: 0;
+  height: 360px;
+  min-height: 200px;
+  border-left: none;
+  border-top: 1px solid var(--border);
+}
+
 .resize-handle {
   position: absolute;
+  z-index: 10;
+}
+
+.resize-handle-left {
   left: -4px;
   top: 0;
   bottom: 0;
   width: 8px;
   cursor: col-resize;
-  z-index: 10;
+}
+
+.resize-handle-top {
+  top: -4px;
+  left: 0;
+  right: 0;
+  height: 8px;
+  cursor: row-resize;
 }
 
 .resize-handle:hover,
@@ -945,7 +1002,14 @@ function isHotLine(n) {
 
 <style>
 body.panel-resizing {
-  cursor: col-resize;
   user-select: none;
+}
+
+body.panel-resizing-col {
+  cursor: col-resize;
+}
+
+body.panel-resizing-row {
+  cursor: row-resize;
 }
 </style>
