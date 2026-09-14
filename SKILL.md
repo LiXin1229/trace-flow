@@ -63,11 +63,11 @@ description: "分析某个功能的完整代码逻辑与调用链路，输出结
 
 ## 渲染流程
 
-分析完成后，执行以下步骤将结果渲染到浏览器（渲染器位于本 skill 目录下的 `trace-flow/` 项目）：
+分析完成后，执行以下步骤将结果渲染到浏览器（渲染器位于本 skill 目录下的 `render/` 项目）：
 
-1. **写入数据文件**：将完整 JSON 以 UTF-8 编码写入 `trace-flow/data/<功能名>.json`。功能名使用小写英文与连字符（如 `homework-detail.json`），语义化地概括被分析的功能。
+1. **写入数据文件**：将完整 JSON 以 UTF-8 编码写入 `render/data/<功能名>.json`。功能名使用小写英文与连字符（如 `homework-detail.json`），语义化地概括被分析的功能。
 
-2. **启动渲染并打开浏览器**：在 `trace-flow` 目录下执行：
+2. **启动渲染并打开浏览器**：在 `render` 目录下执行：
 
    ```bash
    node scripts/serve.mjs --data <功能名>.json
@@ -99,7 +99,7 @@ description: "分析某个功能的完整代码逻辑与调用链路，输出结
 ```
 分析
 {
-  "file_path": "./trace-flow/examples/frontend/detail.js",
+  "file_path": "./examples/frontend/detail.js",
   "line": "#L6-L17",
   "content": "async function loadDetail() { ... }"
 }
@@ -108,7 +108,7 @@ description: "分析某个功能的完整代码逻辑与调用链路，输出结
 
 ### 输出
 
-写入 `trace-flow/data/<功能名>.json`，结果示例：[data.json](./examples/output/data.json)
+写入 `render/data/<功能名>.json`，结果示例：[data.json](./examples/output/data.json)
 
 ## 注意
 
