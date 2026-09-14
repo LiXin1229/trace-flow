@@ -1,0 +1,617 @@
+{
+  "projectRoot": "D:/Projects/InterviewWebsite/cogni-prep-ts",
+  "nodes": [
+    {
+      "id": "1",
+      "name": "InputBox.submit",
+      "filepath": "src/pages/ChatView/InputBox.vue",
+      "line": "#L61-L68",
+      "oneLineSummary": "输入框提交入口，净化用户输入后调用 chatStore.submit 发送并重置输入框",
+      "snippetIntents": [
+        {
+          "content": "调用 chatStore.submit(purifyText(chatStore.customContent), chatStore.funcStatus) 提交内容",
+          "line": "#L64",
+          "associatedId": "8",
+          "associatedType": "call",
+          "associatedRequired": true
+        },
+        {
+          "content": "调用 quillRef.resetForm 重置输入框内容",
+          "line": "#L67",
+          "associatedId": null,
+          "associatedType": null,
+          "associatedRequired": false
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "name": "InputBox.handleEnter",
+      "filepath": "src/pages/ChatView/InputBox.vue",
+      "line": "#L70-L78",
+      "oneLineSummary": "键盘回车（非 Shift/Ctrl）触发提交，校验发送状态与内容非空",
+      "snippetIntents": [
+        {
+          "content": "回车且非 shift 时调用 submit()",
+          "line": "#L76",
+          "associatedId": "1",
+          "associatedType": "call",
+          "associatedRequired": true
+        }
+      ]
+    },
+    {
+      "id": "3",
+      "name": "InputBox.nextQuestion",
+      "filepath": "src/pages/ChatView/InputBox.vue",
+      "line": "#L57-L59",
+      "oneLineSummary": "点击“下一题”按钮，调用 getAIquestion 让 AI 出下一题",
+      "snippetIntents": [
+        {
+          "content": "调用 chatStore.getAIquestion 请求下一题",
+          "line": "#L58",
+          "associatedId": "10",
+          "associatedType": "call",
+          "associatedRequired": true
+        }
+      ]
+    },
+    {
+      "id": "4",
+      "name": "InputBox.abortStream",
+      "filepath": "src/pages/ChatView/InputBox.vue",
+      "line": "#L80-L86",
+      "oneLineSummary": "点击中断按钮，调用 chatStore.abortStream 取消流式生成并提示",
+      "snippetIntents": [
+        {
+          "content": "调用 chatStore.abortStream 中断流式响应",
+          "line": "#L81",
+          "associatedId": "20",
+          "associatedType": "call",
+          "associatedRequired": true
+        }
+      ]
+    },
+    {
+      "id": "5",
+      "name": "ChatView.funcBtn",
+      "filepath": "src/pages/ChatView/index.vue",
+      "line": "#L37-L55",
+      "oneLineSummary": "用户选择功能（回答思路/标准答案/思路+答案/自由对话/自定义问题），设置 funcStatus 与 selectQuestion",
+      "snippetIntents": [
+        {
+          "content": "设置 chatStore.funcStatus 决定后续调用哪种 AI 能力",
+          "line": "#L45",
+          "associatedId": "8",
+          "associatedType": "indirect",
+          "associatedRequired": false
+        },
+        {
+          "content": "设置 chatStore.selectQuestion 记录选中问题内容",
+          "line": "#L53",
+          "associatedId": null,
+          "associatedType": null,
+          "associatedRequired": false
+        }
+      ]
+    },
+    {
+      "id": "6",
+      "name": "ChatView.handleCopy",
+      "filepath": "src/pages/ChatView/index.vue",
+      "line": "#L58-L73",
+      "oneLineSummary": "复制对话消息内容或代码块到剪贴板",
+      "snippetIntents": [
+        {
+          "content": "调用 writeInClipboard 将内容写入剪贴板",
+          "line": "#L69",
+          "associatedId": null,
+          "associatedType": null,
+          "associatedRequired": false
+        }
+      ]
+    },
+    {
+      "id": "7",
+      "name": "ChatView.deleteChat",
+      "filepath": "src/pages/ChatView/index.vue",
+      "line": "#L76-L79",
+      "oneLineSummary": "用户点击删除对话，将目标存入 selectChat 并弹出删除确认框",
+      "snippetIntents": [
+        {
+          "content": "设置 chatStore.selectChat 并打开删除弹窗 userStore.showDialog='deleteChat'",
+          "line": "#L77",
+          "associatedId": "21",
+          "associatedType": "indirect",
+          "associatedRequired": false
+        }
+      ]
+    },
+    {
+      "id": "8",
+      "name": "chatStore.submit",
+      "filepath": "src/stores/chat.ts",
+      "line": "#L143-L165",
+      "oneLineSummary": "核心分发函数：根据当前 chatStatus 路由到提问/回答/帮助分支",
+      "snippetIntents": [
+        {
+          "content": "调用 checkArea 校验是否已选择领域",
+          "line": "#L144",
+          "associatedId": "9",
+          "associatedType": "call",
+          "associatedRequired": true
+        },
+        {
+          "content": "chatStatus 为 question 时调用 getAIquestion",
+          "line": "#L150",
+          "associatedId": "10",
+          "associatedType": "call",
+          "associatedRequired": true
+        },
+        {
+          "content": "chatStatus 为 user 且 funcStatus=0 时调用 userAnwer",
+          "line": "#L157",
+          "associatedId": "11",
+          "associatedType": "call",
+          "associatedRequired": true
+        },
+        {
+          "content": "chatStatus 为 user 且 funcStatus≠0 时调用 getHelp",
+          "line": "#L162",
+          "associatedId": "12",
+          "associatedType": "call",
+          "associatedRequired": true
+        }
+      ]
+    },
+    {
+      "id": "9",
+      "name": "chatStore.checkArea",
+      "filepath": "src/stores/chat.ts",
+      "line": "#L168-L179",
+      "oneLineSummary": "校验当前是否已选择领域，未选则提示并弹出选择框",
+      "snippetIntents": [
+        {
+          "content": "未选领域时弹出 selectArea 对话框并返回 false",
+          "line": "#L175",
+          "associatedId": null,
+          "associatedType": null,
+          "associatedRequired": false
+        }
+      ]
+    },
+    {
+      "id": "10",
+      "name": "chatStore.getAIquestion",
+      "filepath": "src/stores/chat.ts",
+      "line": "#L182-L216",
+      "oneLineSummary": "请求 AI 出一道新题，先初始化会话/对话，再发起流式响应",
+      "snippetIntents": [
+        {
+          "content": "调用 checkArea 校验领域",
+          "line": "#L183",
+          "associatedId": "9",
+          "associatedType": "call",
+          "associatedRequired": true
+        },
+        {
+          "content": "sessionId<0 时调用 sessionStore.initSession 新建会话",
+          "line": "#L187",
+          "associatedId": "23",
+          "associatedType": "call",
+          "associatedRequired": true
+        },
+        {
+          "content": "调用 initDisplayChat 加载新会话聊天记录",
+          "line": "#L189",
+          "associatedId": "19",
+          "associatedType": "call",
+          "associatedRequired": true
+        },
+        {
+          "content": "调用 initChat 初始化对话获取 chatId",
+          "line": "#L193",
+          "associatedId": "15",
+          "associatedType": "call",
+          "associatedRequired": true
+        },
+        {
+          "content": "成功后调用 getStreamResponse 流式拉取题目(API.interviewStart)",
+          "line": "#L196",
+          "associatedId": "14",
+          "associatedType": "call",
+          "associatedRequired": true
+        }
+      ]
+    },
+    {
+      "id": "11",
+      "name": "chatStore.userAnwer",
+      "filepath": "src/stores/chat.ts",
+      "line": "#L412-L453",
+      "oneLineSummary": "用户正常回答后，保存用户发言并请求 AI 对该回答做出评价（流式）",
+      "snippetIntents": [
+        {
+          "content": "调用 pushUserText 将用户回答推入聊天列表",
+          "line": "#L414",
+          "associatedId": "18",
+          "associatedType": "call",
+          "associatedRequired": true
+        },
+        {
+          "content": "调用 saveUserWords 保存用户发言到后端",
+          "line": "#L424",
+          "associatedId": "16",
+          "associatedType": "call",
+          "associatedRequired": true
+        },
+        {
+          "content": "调用 initChat 初始化评价对话",
+          "line": "#L434",
+          "associatedId": "15",
+          "associatedType": "call",
+          "associatedRequired": true
+        },
+        {
+          "content": "成功后调用 getStreamResponse 流式拉取评价(API.interviewAnswer)",
+          "line": "#L437",
+          "associatedId": "14",
+          "associatedType": "call",
+          "associatedRequired": true
+        }
+      ]
+    },
+    {
+      "id": "12",
+      "name": "chatStore.getHelp",
+      "filepath": "src/stores/chat.ts",
+      "line": "#L456-L497",
+      "oneLineSummary": "根据功能类型获取答题帮助（思路/答案/自由对话），status=5 走自定义问题",
+      "snippetIntents": [
+        {
+          "content": "status===5 调用 custQustion 处理自定义问题",
+          "line": "#L458",
+          "associatedId": "13",
+          "associatedType": "call",
+          "associatedRequired": true
+        },
+        {
+          "content": "调用 pushUserText 推入用户输入",
+          "line": "#L462",
+          "associatedId": "18",
+          "associatedType": "call",
+          "associatedRequired": true
+        },
+        {
+          "content": "调用 saveUserWords 保存用户发言",
+          "line": "#L471",
+          "associatedId": "16",
+          "associatedType": "call",
+          "associatedRequired": true
+        },
+        {
+          "content": "调用 initChat 初始化帮助对话",
+          "line": "#L480",
+          "associatedId": "15",
+          "associatedType": "call",
+          "associatedRequired": true
+        },
+        {
+          "content": "成功后调用 getStreamResponse 流式拉取帮助(API.interviewHelp)",
+          "line": "#L483",
+          "associatedId": "14",
+          "associatedType": "call",
+          "associatedRequired": true
+        }
+      ]
+    },
+    {
+      "id": "13",
+      "name": "chatStore.custQustion",
+      "filepath": "src/stores/chat.ts",
+      "line": "#L500-L541",
+      "oneLineSummary": "处理用户自定义问题，保存为一条 question 类型的聊天记录",
+      "snippetIntents": [
+        {
+          "content": "调用 pushUserText 推入自定义问题",
+          "line": "#L507",
+          "associatedId": "18",
+          "associatedType": "call",
+          "associatedRequired": true
+        },
+        {
+          "content": "调用 request(API.saveCust) 保存到后端",
+          "line": "#L517",
+          "associatedId": "24",
+          "associatedType": "call",
+          "associatedRequired": true
+        },
+        {
+          "content": "调用 pushUserText 用后端返回的 chatId 替换占位",
+          "line": "#L526",
+          "associatedId": "18",
+          "associatedType": "call",
+          "associatedRequired": true
+        }
+      ]
+    },
+    {
+      "id": "14",
+      "name": "chatStore.getStreamResponse",
+      "filepath": "src/stores/chat.ts",
+      "line": "#L218-L321",
+      "oneLineSummary": "核心流式响应处理：fetch + ReadableStream 读取 SSE 数据，支持 AbortController 中断",
+      "snippetIntents": [
+        {
+          "content": "为当前会话创建 AbortController 用于外部中断",
+          "line": "#L226",
+          "associatedId": null,
+          "associatedType": null,
+          "associatedRequired": false
+        },
+        {
+          "content": "使用原生 fetch 发送流式 POST 请求",
+          "line": "#L247",
+          "associatedId": null,
+          "associatedType": null,
+          "associatedRequired": false
+        },
+        {
+          "content": "通过 reader 逐块读取并以 processBuffer 解析 data: 前缀的 SSE 片段",
+          "line": "#L271",
+          "associatedId": null,
+          "associatedType": null,
+          "associatedRequired": false
+        },
+        {
+          "content": "流式结束时调用 saveChat 持久化完整内容",
+          "line": "#L295",
+          "associatedId": "17",
+          "associatedType": "call",
+          "associatedRequired": true
+        },
+        {
+          "content": "异常（含中断）时调用 saveChat 保存已生成内容",
+          "line": "#L315",
+          "associatedId": "17",
+          "associatedType": "call",
+          "associatedRequired": true
+        }
+      ]
+    },
+    {
+      "id": "15",
+      "name": "chatStore.initChat",
+      "filepath": "src/stores/chat.ts",
+      "line": "#L324-L341",
+      "oneLineSummary": "向后端初始化对话，申请 chatId/session 等资源",
+      "snippetIntents": [
+        {
+          "content": "调用 request(API.initChat) 提交 sessionId 与 msgType",
+          "line": "#L329",
+          "associatedId": "24",
+          "associatedType": "call",
+          "associatedRequired": true
+        }
+      ]
+    },
+    {
+      "id": "16",
+      "name": "chatStore.saveUserWords",
+      "filepath": "src/stores/chat.ts",
+      "line": "#L343-L373",
+      "oneLineSummary": "将用户发言保存到后端并返回 chatId",
+      "snippetIntents": [
+        {
+          "content": "调用 request(API.saveUserWords) 保存用户发言",
+          "line": "#L349",
+          "associatedId": "24",
+          "associatedType": "call",
+          "associatedRequired": true
+        },
+        {
+          "content": "将返回记录推入 backupChatList 作为容错备份",
+          "line": "#L360",
+          "associatedId": null,
+          "associatedType": null,
+          "associatedRequired": false
+        }
+      ]
+    },
+    {
+      "id": "17",
+      "name": "chatStore.saveChat",
+      "filepath": "src/stores/chat.ts",
+      "line": "#L375-L409",
+      "oneLineSummary": "将 AI 流式结果（或中断内容）保存到后端",
+      "snippetIntents": [
+        {
+          "content": "调用 request(API.saveChat) 持久化聊天内容",
+          "line": "#L384",
+          "associatedId": "24",
+          "associatedType": "call",
+          "associatedRequired": true
+        },
+        {
+          "content": "保存成功后将记录推入 backupChatList",
+          "line": "#L398",
+          "associatedId": null,
+          "associatedType": null,
+          "associatedRequired": false
+        }
+      ]
+    },
+    {
+      "id": "18",
+      "name": "chatStore.pushUserText",
+      "filepath": "src/stores/chat.ts",
+      "line": "#L543-L552",
+      "oneLineSummary": "将用户文本推入聊天列表（新增或替换占位 id）",
+      "snippetIntents": [
+        {
+          "content": "本地更新 chatList，isReplace 时用后端 chatId 替换占位",
+          "line": "#L548",
+          "associatedId": null,
+          "associatedType": null,
+          "associatedRequired": false
+        }
+      ]
+    },
+    {
+      "id": "19",
+      "name": "chatStore.initDisplayChat",
+      "filepath": "src/stores/chat.ts",
+      "line": "#L77-L104",
+      "oneLineSummary": "加载指定会话的历史聊天记录并加入聊天队列",
+      "snippetIntents": [
+        {
+          "content": "调用 request(API.getChatData) 拉取历史聊天",
+          "line": "#L83",
+          "associatedId": "24",
+          "associatedType": "call",
+          "associatedRequired": true
+        },
+        {
+          "content": "调用 pushChatQueue 加入缓存队列（最多保留 5 个会话）",
+          "line": "#L92",
+          "associatedId": null,
+          "associatedType": null,
+          "associatedRequired": false
+        }
+      ]
+    },
+    {
+      "id": "20",
+      "name": "chatStore.abortStream",
+      "filepath": "src/stores/chat.ts",
+      "line": "#L67-L74",
+      "oneLineSummary": "中止当前会话的流式请求",
+      "snippetIntents": [
+        {
+          "content": "调用 controller.abort() 主动中断 fetch 流",
+          "line": "#L71",
+          "associatedId": null,
+          "associatedType": null,
+          "associatedRequired": false
+        }
+      ]
+    },
+    {
+      "id": "21",
+      "name": "chatStore.deleteChat",
+      "filepath": "src/stores/chat.ts",
+      "line": "#L557-L580",
+      "oneLineSummary": "删除单条对话记录（前端列表与后端同步）",
+      "snippetIntents": [
+        {
+          "content": "调用 request(API.deleteChat) 删除后端记录",
+          "line": "#L564",
+          "associatedId": "24",
+          "associatedType": "call",
+          "associatedRequired": true
+        },
+        {
+          "content": "从 chatList 与 backupChatList 中过滤掉已删除记录",
+          "line": "#L574",
+          "associatedId": null,
+          "associatedType": null,
+          "associatedRequired": false
+        }
+      ]
+    },
+    {
+      "id": "22",
+      "name": "chatStore.submitPrefers",
+      "filepath": "src/stores/chat.ts",
+      "line": "#L592-L638",
+      "oneLineSummary": "将选中的对话提交为收藏",
+      "snippetIntents": [
+        {
+          "content": "调用 request(API.initPrefer) 创建收藏记录",
+          "line": "#L608",
+          "associatedId": "24",
+          "associatedType": "call",
+          "associatedRequired": true
+        }
+      ]
+    },
+    {
+      "id": "23",
+      "name": "sessionStore.initSession",
+      "filepath": "src/stores/session.ts",
+      "line": "#L96-L129",
+      "oneLineSummary": "新建刷题会话并路由到新会话页面",
+      "snippetIntents": [
+        {
+          "content": "调用 request(API.initSession) 创建会话",
+          "line": "#L100",
+          "associatedId": "24",
+          "associatedType": "call",
+          "associatedRequired": true
+        },
+        {
+          "content": "router.push 跳转到新会话路由 /chat/:sessionId",
+          "line": "#L114",
+          "associatedId": null,
+          "associatedType": null,
+          "associatedRequired": false
+        }
+      ]
+    },
+    {
+      "id": "24",
+      "name": "request",
+      "filepath": "src/utils/request.ts",
+      "line": "#L97-L124",
+      "oneLineSummary": "基于 axios 的通用请求封装，处理鉴权与响应拦截",
+      "snippetIntents": [
+        {
+          "content": "instance(config) 发起实际网络请求",
+          "line": "#L117",
+          "associatedId": null,
+          "associatedType": null,
+          "associatedRequired": false
+        }
+      ]
+    },
+    {
+      "id": "25",
+      "name": "parseMarkdown",
+      "filepath": "src/utils/markdown.ts",
+      "line": "#L29-L95",
+      "oneLineSummary": "将 AI 返回的 Markdown 渲染为带代码块头部与高亮的 HTML",
+      "snippetIntents": [
+        {
+          "content": "marked 将 Markdown 转为 HTML",
+          "line": "#L35",
+          "associatedId": null,
+          "associatedType": null,
+          "associatedRequired": false
+        },
+        {
+          "content": "调用 purifyText 对生成的 HTML 做安全净化",
+          "line": "#L37",
+          "associatedId": "26",
+          "associatedType": "call",
+          "associatedRequired": false
+        }
+      ]
+    },
+    {
+      "id": "26",
+      "name": "purifyText",
+      "filepath": "src/utils/purifyText.ts",
+      "line": "#L21-L23",
+      "oneLineSummary": "使用 DOMPurify 对 HTML 做白名单净化，防止 XSS",
+      "snippetIntents": [
+        {
+          "content": "DOMPurify.sanitize 过滤危险标签与属性",
+          "line": "#L22",
+          "associatedId": null,
+          "associatedType": null,
+          "associatedRequired": false
+        }
+      ]
+    }
+  ]
+}

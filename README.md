@@ -36,6 +36,8 @@ trace-flow/
 │   ├── frontend/           # 模拟前端代码
 │   ├── backend/            # 模拟后端代码
 │   └── output/             # 分析结果示例 data.json
+├── validate/               # JSON 校验脚本（零依赖）
+│   └── validate.mjs        # 校验调用链数据是否符合 SKILL.md 的结构与约束
 └── render/                 # 渲染器项目（Vue 3 + Vite）
     ├── data/               # 调用链数据（运行时由服务端动态读取）
     ├── dist/               # 静态构建产物（随仓库提供，渲染零依赖）
@@ -100,7 +102,8 @@ Skill 会按以下方式自动推进，无需你逐步干预：
 3. **请求链路**：遇到请求方法时，沿请求路径继续分析后端上下游。
 4. **完整覆盖**：遍历整条调用链，不遗漏任何下游函数。
 5. **生成数据**：产出结构化 JSON，写入 `render/data/<功能名>.json`。
-6. **启动渲染**：自动启动服务并打开浏览器展示树图。
+6. **校验数据**：运行 `node validate/validate.mjs render/data/<功能名>.json` 校验结构与约束，不通过则中断流程并输出原因。
+7. **启动渲染**：自动启动服务并打开浏览器展示树图。
 
 ### 3. 查看结果
 
@@ -271,3 +274,4 @@ node scripts/serve.mjs --no-open --data homework-detail.json
 - `associatedId` 为 `null` 时，`associatedType` 必须为 `null`，`associatedRequired` 必须为 `false`。
 - 同一行代码调用多个函数时，应为每个被调函数新增一个独立的 `snippetIntents` 条目（行号相同）。
 - 行号需确保精确，否则详情面板源码定位会偏移。
+- 渲染前必须先通过 `node validate/validate.mjs render/data/<功能名>.json` 校验，不通过则中断并修正后重试。
