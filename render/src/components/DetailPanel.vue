@@ -168,7 +168,7 @@ const HIGHLIGHT_EXTS = {
   html: 'xml',
   htm: 'xml',
   xml: 'xml',
-  vue: 'xml',
+  vue: 'typescript',
   css: 'css',
   json: 'json',
   sql: 'sql',

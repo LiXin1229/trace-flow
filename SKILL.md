@@ -30,7 +30,7 @@ description: "分析某个功能的完整代码逻辑与调用链路，输出结
       "snippetIntents": [
         {
           "content": "<这部分代码的作用/内容>",
-          "line": "<所在行号>",
+          "line": "<所在行号，如 '#L24-L28'>",
           "associatedId": "<关联的函数或方法 Id，无关联则为 null>",
           "associatedType": "<关联的函数的方式, 可选值为 'call' | 'return' | 'indirect' | null>",
           "associatedRequired": "<是否和该功能强相关，可选值为 true | false>"
@@ -44,6 +44,7 @@ description: "分析某个功能的完整代码逻辑与调用链路，输出结
 ### 字段说明
 
 - `projectRoot`：被分析项目的根目录**绝对路径**，用于渲染器详情面板读取源码
+- `line`：行号范围，格式为 `#L<起始行>`（单行）或 `#L<起始行>-L<结束行>`（多行），如 `#L102`、`#L239-L295`；`snippetIntents[].line` 同样使用该格式
 - `associatedType` 取值：
   - `call`：仅调用该关联函数
   - `return`：调用后使用其返回值
