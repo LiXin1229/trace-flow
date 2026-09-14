@@ -54,6 +54,17 @@ description: "分析某个功能的完整代码逻辑与调用链路，输出结
   - `true`：该关联与功能核心逻辑强相关
   - `false`：辅助性代码（打日志、鉴权、参数校验等对理解核心功能无益），且无关联函数时为 `false`（`associatedId` 为 `null` 则 `associatedRequired` 必须为 `false`）
 
+### 分析风格
+
+对于 `oneLineSummary` 和 `snippetIntents` 的 `content` 字段，如果代码意图比较抽象，可以通过举例的方式说明。
+比如
+```
+chalk 本身是一个函数，直接当作函数调用时只是把入参用空格拼起来（不上色）。
+
+const chalk = createChalk();
+chalk('hello', 'world');     // => 'hello world'
+```
+
 ## 分析方法
 
 1. **确定入口**：用户给出的函数可能不是最上游，需要先通过调用关系找到最上游的入口函数/方法，比如某个挂载时调用的初始化方法或者 click 事件的处理函数等。

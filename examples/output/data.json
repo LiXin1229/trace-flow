@@ -60,7 +60,7 @@
         "associatedRequired": false
       },
       {
-        "content": "将统计信息渲染到 statsText（总题数 / 对 / 半对 / 错）",
+        "content": "将统计信息渲染到 statsText（总题数 / 对 / 半对 / 错），比如作业共 5 题、对 3、半对 1、错 1 时：\n\nstatsText.textContent = '共 5 题 · 对 3 · 半对 1 · 错 1'",
         "line": "#L15-L16",
         "associatedId": null,
         "associatedType": null,
@@ -83,7 +83,7 @@
         "associatedRequired": false
       },
       {
-        "content": "根据类型（error/success 等）拼接样式类名并赋给元素",
+        "content": "根据类型（error/success 等）拼接样式类名并赋给元素，比如：\n\nshowMsg(el, '加载失败', 'error');\n// el.textContent === '加载失败'\n// el.className === 'msg error'",
         "line": "#L3",
         "associatedId": null,
         "associatedType": null,
@@ -99,7 +99,7 @@
     "oneLineSummary": "通用请求封装：合并请求头并发送 fetch，解析 JSON 响应后返回，连接失败或响应异常时抛出错误",
     "snippetIntents": [
       {
-        "content": "合并传入的请求头，若未指定 Content-Type 且 body 非 FormData，则默认设为 application/json",
+        "content": "合并传入的请求头，若未指定 Content-Type 且 body 非 FormData，则默认设为 application/json，比如：\n\napiRequest('/api/homework/detail?homework_id=1');\n// 实际发送的 headers: { 'Content-Type': 'application/json' }",
         "line": "#L4-L7",
         "associatedId": null,
         "associatedType": null,
@@ -136,7 +136,7 @@
     "oneLineSummary": "GET /api/homework/detail 路由处理：鉴权并获取数据库会话后调用 HomeworkService.get_detail 获取详情，成功返回 success，异常返回 fail",
     "snippetIntents": [
       {
-        "content": "路由定义：GET /api/homework/detail，接收 homework_id 参数",
+        "content": "路由定义：GET /api/homework/detail，接收 homework_id 查询参数，比如请求 GET /api/homework/detail?homework_id=1 时函数收到 homework_id=1",
         "line": "#L13-L15",
         "associatedId": null,
         "associatedType": null,
@@ -201,7 +201,7 @@
         "associatedRequired": true
       },
       {
-        "content": "组装详情字典：作业基本字段 + 统计信息（total/correct/half/wrong）+ 题目列表（id/ocr_text/answer/result）",
+        "content": "组装详情字典：作业基本字段 + 统计信息（total/correct/half/wrong）+ 题目列表（id/ocr_text/answer/result），形如：\n\n{\n  'id': 1, 'user_id': 7, 'original_img': 'a.png', 'status': 2,\n  'total_questions': 5, 'correct_count': 3, 'half_correct_count': 1, 'wrong_count': 1,\n  'questions': [{ 'id': 11, 'ocr_text': '1+1=?', 'answer': '2', 'result': 1 }, ...]\n}",
         "line": "#L30-L48",
         "associatedId": null,
         "associatedType": null,
@@ -268,7 +268,7 @@
         "associatedRequired": false
       },
       {
-        "content": "构造 CurrentUser 数据对象（id/username/role）并返回",
+        "content": "构造 CurrentUser 数据对象（id/username/role）并返回，比如 token 解码出 {'sub': '1', 'username': 'Tom', 'role': 2} 时：\n\nCurrentUser(id=1, username='Tom', role=2)",
         "line": "#L30-L33",
         "associatedId": null,
         "associatedType": null,
@@ -307,7 +307,7 @@
     "oneLineSummary": "成功响应封装：返回 JSONResponse，body 为 {code:200, msg, data}",
     "snippetIntents": [
       {
-        "content": "构造 JSONResponse，status_code=200，content 为 {code:200, msg, data}",
+        "content": "构造 JSONResponse，status_code=200，content 为 {code:200, msg, data}，比如：\n\nsuccess(data={'id': 1})\n# HTTP 200，body: {'code': 200, 'msg': 'success', 'data': {'id': 1}}",
         "line": "#L7-L9",
         "associatedId": null,
         "associatedType": null,
@@ -323,7 +323,7 @@
     "oneLineSummary": "失败响应封装：返回 JSONResponse，body 为 {code, msg, data}",
     "snippetIntents": [
       {
-        "content": "构造 JSONResponse，status_code=200，content 为 {code, msg, data}",
+        "content": "构造 JSONResponse，status_code=200，content 为 {code, msg, data}（HTTP 状态恒为 200，业务错误码放在 body 的 code 字段里），比如：\n\nfail('作业不存在', 500)\n# HTTP 200，body: {'code': 500, 'msg': '作业不存在', 'data': {}}",
         "line": "#L14-L16",
         "associatedId": null,
         "associatedType": null,
@@ -339,7 +339,7 @@
     "oneLineSummary": "自定义 API 异常类，携带 msg 和 code 用于业务错误响应",
     "snippetIntents": [
       {
-        "content": "初始化 msg 和 code 并调用父类 __init__",
+        "content": "初始化 msg 和 code 并调用父类 __init__，比如：\n\ne = ApiException('作业不存在', 500)\n# e.msg == '作业不存在'，e.code == 500，str(e) == '作业不存在'",
         "line": "#L2-L4",
         "associatedId": null,
         "associatedType": null,

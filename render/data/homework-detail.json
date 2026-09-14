@@ -39,7 +39,7 @@
     "oneLineSummary": "加载作业详情：请求详情接口，失败时提示错误，成功后标记加载完成并渲染统计信息",
     "snippetIntents": [
       {
-        "content": "调用 apiRequest 请求 GET /api/homework/detail?homework_id=... 获取作业详情，并使用返回的 res",
+        "content": "调用 apiRequest 请求 GET /api/homework/detail?homework_id=... 获取作业详情，并使用返回的 res。\n\napiRequest(`/api/homework/detail?homework_id=${homeworkId}`)\n// homeworkId=3 时 => GET /api/homework/detail?homework_id=3",
         "line": "#L7",
         "associatedId": "4",
         "associatedType": "return",
@@ -60,7 +60,7 @@
         "associatedRequired": false
       },
       {
-        "content": "将统计信息渲染到 statsText（总题数 / 对 / 半对 / 错）",
+        "content": "将统计信息渲染到 statsText（总题数 / 对 / 半对 / 错）。\n\n// 假设 total=10, correct=7, half=1, wrong=2\nstatsText.textContent = \"共 10 题 · 对 7 · 半对 1 · 错 2\"",
         "line": "#L15-L16",
         "associatedId": null,
         "associatedType": null,
@@ -83,7 +83,7 @@
         "associatedRequired": false
       },
       {
-        "content": "根据类型（error/success 等）拼接样式类名并赋给元素",
+        "content": "根据类型（error/success 等）拼接样式类名并赋给元素。\n\nshowMsg(el, \"加载失败\", \"error\");   // => el.className = \"msg error\"",
         "line": "#L3",
         "associatedId": null,
         "associatedType": null,
@@ -99,14 +99,14 @@
     "oneLineSummary": "通用请求封装：合并请求头并发送 fetch，解析 JSON 响应后返回，连接失败或响应异常时抛出错误",
     "snippetIntents": [
       {
-        "content": "合并传入的请求头，若未指定 Content-Type 且 body 非 FormData，则默认设为 application/json",
+        "content": "合并传入的请求头，若未指定 Content-Type 且 body 非 FormData，则默认设为 application/json。\n\napiRequest(\"/x\")                         // => headers = { \"Content-Type\": \"application/json\" }\napiRequest(\"/x\", { body: formData })     // => 不设置 Content-Type（由浏览器自动生成 boundary）",
         "line": "#L4-L7",
         "associatedId": null,
         "associatedType": null,
         "associatedRequired": false
       },
       {
-        "content": "调用 fetch 发送请求（路径为 API_BASE + path），间接触发后端 GET /api/homework/detail 路由；连接失败时抛出「无法连接后端服务」错误",
+        "content": "调用 fetch 发送请求（路径为 API_BASE + path），间接触发后端 GET /api/homework/detail 路由；连接失败时抛出「无法连接后端服务」错误。这里 API_BASE 是空字符串，实际请求的就是 path 本身（走当前域名）。\n\nfetch(\"\" + \"/api/homework/detail?homework_id=3\")   // => 请求当前域名下的 /api/homework/detail?homework_id=3",
         "line": "#L9-L14",
         "associatedId": "5",
         "associatedType": "indirect",
@@ -136,21 +136,21 @@
     "oneLineSummary": "GET /api/homework/detail 路由处理：鉴权并获取数据库会话后调用 HomeworkService.get_detail 获取详情，成功返回 success，异常返回 fail",
     "snippetIntents": [
       {
-        "content": "路由定义：GET /api/homework/detail，接收 homework_id 参数",
+        "content": "路由定义：GET /api/homework/detail，接收 homework_id 参数。完整路径由 router 前缀与装饰器路径拼接而成。\n\nAPIRouter(prefix=\"/api/homework\") + @router.get(\"/detail\")\n// => GET /api/homework/detail",
         "line": "#L13-L15",
         "associatedId": null,
         "associatedType": null,
         "associatedRequired": false
       },
       {
-        "content": "依赖注入 get_current_user 进行 JWT 鉴权",
+        "content": "依赖注入 get_current_user 进行 JWT 鉴权。Depends 表示 FastAPI 在进入路由函数前先调用该依赖函数，并把返回值赋给参数。\n\ncurrent_user: CurrentUser = Depends(get_current_user)\n// => FastAPI 先执行 get_current_user()，将返回的 CurrentUser 注入 current_user",
         "line": "#L16",
         "associatedId": "8",
         "associatedType": "indirect",
         "associatedRequired": false
       },
       {
-        "content": "依赖注入 get_db 获取数据库会话",
+        "content": "依赖注入 get_db 获取数据库会话，同样由 FastAPI 在进入路由前先调用依赖函数并注入其产出值。\n\ndb: Session = Depends(get_db)\n// => FastAPI 先执行 get_db()，将 yield 出的 Session 注入 db",
         "line": "#L17",
         "associatedId": "9",
         "associatedType": "indirect",
@@ -194,14 +194,14 @@
         "associatedRequired": true
       },
       {
-        "content": "查询 Question 表，按 homework_id 过滤并按 id 排序获取题目列表",
+        "content": "查询 Question 表，按 homework_id 过滤并按 id 排序获取题目列表。这段 ORM 链式调用等价于 SQL：\n\nSELECT * FROM question WHERE homework_id = ? ORDER BY id;",
         "line": "#L24-L29",
         "associatedId": "9",
         "associatedType": "indirect",
         "associatedRequired": true
       },
       {
-        "content": "组装详情字典：作业基本字段 + 统计信息（total/correct/half/wrong）+ 题目列表（id/ocr_text/answer/result）",
+        "content": "组装详情字典：作业基本字段 + 统计信息（total/correct/half/wrong）+ 题目列表（id/ocr_text/answer/result）。\n\n{\n  \"id\": 1, \"status\": 1, \"total_questions\": 2,\n  \"correct_count\": 1, \"half_correct_count\": 0, \"wrong_count\": 1,\n  \"questions\": [{\"id\": 1, \"ocr_text\": \"1+1=?\", \"answer\": \"2\", \"result\": 1}, ...]\n}",
         "line": "#L30-L48",
         "associatedId": null,
         "associatedType": null,
@@ -217,7 +217,7 @@
     "oneLineSummary": "获取作业记录并做权限校验：作业不存在抛异常，非管理员且非本人作业则拒绝访问",
     "snippetIntents": [
       {
-        "content": "通过 db.get(Homework, homework_id) 查询作业记录",
+        "content": "通过 db.get(Homework, homework_id) 查询作业记录。db.get 按主键查询，等价于 SQL：\n\nSELECT * FROM homework WHERE id = ?;",
         "line": "#L15",
         "associatedId": "9",
         "associatedType": "indirect",
@@ -261,14 +261,14 @@
         "associatedRequired": false
       },
       {
-        "content": "提取 token 并调用 jwt.decode 解码，失败时抛出 ApiException(\"令牌无效或已过期\", 401)",
+        "content": "提取 token 并调用 jwt.decode 解码，失败时抛出 ApiException(\"令牌无效或已过期\", 401)。解码后得到登录时签发的用户信息载荷。\n\njwt.decode(\"eyJhbGciOi...\", \"change-me\")\n// => {\"sub\": \"1\", \"username\": \"alice\", \"role\": 1}",
         "line": "#L24-L28",
         "associatedId": "12",
         "associatedType": "call",
         "associatedRequired": false
       },
       {
-        "content": "构造 CurrentUser 数据对象（id/username/role）并返回",
+        "content": "构造 CurrentUser 数据对象（id/username/role）并返回。\n\n// payload = {\"sub\": \"1\", \"username\": \"alice\", \"role\": 1}\nCurrentUser(id=1, username=\"alice\", role=1)",
         "line": "#L30-L33",
         "associatedId": null,
         "associatedType": null,
@@ -291,7 +291,7 @@
         "associatedRequired": false
       },
       {
-        "content": "yield 会话，请求结束后在 finally 中关闭 db.close()",
+        "content": "yield 会话，请求结束后在 finally 中关闭 db.close()。这是生成器式依赖：yield 之前的代码在请求前执行，yield 出的值被注入路由，finally 中的代码在请求结束后执行。\n\ndb = SessionLocal()   # 请求前：创建会话\nyield db              # 请求中：路由使用该会话\ndb.close()            # 请求后：finally 中关闭会话",
         "line": "#L39-L41",
         "associatedId": null,
         "associatedType": null,
@@ -307,7 +307,7 @@
     "oneLineSummary": "成功响应封装：返回 JSONResponse，body 为 {code:200, msg, data}",
     "snippetIntents": [
       {
-        "content": "构造 JSONResponse，status_code=200，content 为 {code:200, msg, data}",
+        "content": "构造 JSONResponse，status_code=200，content 为 {code:200, msg, data}。\n\nsuccess(data={\"id\": 1})\n// => HTTP 200，body: {\"code\": 200, \"msg\": \"success\", \"data\": {\"id\": 1}}",
         "line": "#L7-L9",
         "associatedId": null,
         "associatedType": null,
@@ -323,7 +323,7 @@
     "oneLineSummary": "失败响应封装：返回 JSONResponse，body 为 {code, msg, data}",
     "snippetIntents": [
       {
-        "content": "构造 JSONResponse，status_code=200，content 为 {code, msg, data}",
+        "content": "构造 JSONResponse，status_code=200，content 为 {code, msg, data}。注意业务失败时 HTTP 状态码仍是 200，错误码只体现在 body 的 code 字段。\n\nfail(\"作业不存在\", 500)\n// => HTTP 200，body: {\"code\": 500, \"msg\": \"作业不存在\", \"data\": {}}",
         "line": "#L14-L16",
         "associatedId": null,
         "associatedType": null,
@@ -339,7 +339,7 @@
     "oneLineSummary": "自定义 API 异常类，携带 msg 和 code 用于业务错误响应",
     "snippetIntents": [
       {
-        "content": "初始化 msg 和 code 并调用父类 __init__",
+        "content": "初始化 msg 和 code 并调用父类 __init__。\n\nraise ApiException(\"作业不存在\", 500)\n// => exc.msg = \"作业不存在\"，exc.code = 500",
         "line": "#L2-L4",
         "associatedId": null,
         "associatedType": null,
