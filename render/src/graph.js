@@ -4,7 +4,7 @@
 // ------------------------------------------------------------------
 
 export const NODE_W = 300 // 需与 style.css 中 .node-card 保持一致
-export const NODE_H = 92
+export const NODE_H = 105
 export const GAP_X = 80
 export const GAP_Y = 18
 const PAD = 40

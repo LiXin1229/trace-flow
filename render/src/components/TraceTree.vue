@@ -394,11 +394,10 @@ defineExpose({ reveal, fitView })
   pointer-events: none;
 }
 
-/* ---------- 节点卡片（宽高需与 graph.js 常量一致：300 x 92） ---------- */
 .node-card {
   position: absolute;
   width: 300px;
-  height: 92px;
+  max-height: 118px;
   padding: 10px 14px 8px;
   border: 1px solid var(--border);
   border-radius: 10px;
@@ -467,7 +466,7 @@ defineExpose({ reveal, fitView })
   line-height: 1.45;
   color: var(--text-dim);
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
   flex: 1;
