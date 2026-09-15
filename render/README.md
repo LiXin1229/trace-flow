@@ -36,6 +36,10 @@ node scripts/serve.mjs --data homework-detail.json
 node scripts/serve.mjs --port 5174   # 指定端口
 node scripts/serve.mjs --rebuild     # 渲染器代码更新后重新构建（需要开发环境）
 node scripts/serve.mjs --no-open     # 只启动服务，不自动打开浏览器
+
+# 停止服务（关闭由 serve.mjs 启动的服务）
+node scripts/stop.mjs              # 停止默认端口 4173 的服务
+node scripts/stop.mjs --port 5174  # 停止指定端口的服务
 ```
 
 ### 开发调试
