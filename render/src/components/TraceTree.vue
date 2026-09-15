@@ -82,7 +82,7 @@
             <span>关键变量</span>
             <button class="kv-close" title="关闭" @click.stop="closeBubble(b)">×</button>
           </div>
-          <ul class="kv-list">
+          <ul class="kv-list" @pointerdown.stop @wheel.stop>
             <li v-for="(v, i) in b.vars" :key="i" class="kv-item">
               <div class="kv-name mono">
                 {{ v.name }}
@@ -639,6 +639,7 @@ defineExpose({ reveal, fitView })
   gap: 8px;
   max-height: 220px;
   overflow: auto;
+  pointer-events: auto;
 }
 
 .kv-item {
@@ -671,6 +672,7 @@ defineExpose({ reveal, fitView })
   line-height: 1.5;
   color: var(--text-dim);
   margin-top: 3px;
+  word-break: break-word;
 }
 
 /* ---------- 工具条 ---------- */
