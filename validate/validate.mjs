@@ -5,22 +5,36 @@
 // 校验不通过时以非零状态码退出，并输出具体原因，供上层中断流程。
 //
 // 用法：
-//   node validate/validate.mjs <path/to/data.json>
+//   node validate/validate.mjs <path/to/data.json> [--publish]
+//
+//   --publish  校验通过后将数据文件移动到 render/data/，并清理空的 .cache 目录
 //
 // 退出码：
 //   0  校验通过
 //   1  校验不通过（参数错误 / JSON 解析失败 / 约束违反）
 // ------------------------------------------------------------------
 
-import { readFileSync, statSync } from 'node:fs'
+import {
+  readFileSync,
+  statSync,
+  existsSync,
+  renameSync,
+  rmdirSync,
+  rmSync
+} from 'node:fs'
 import path from 'node:path'
-import { pathToFileURL } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 
 const log = (msg) => console.log(`[traceflow-validate] ${msg}`)
 const fail = (msg) => {
   console.error(`[traceflow-validate] 错误：${msg}`)
   process.exit(1)
 }
+
+// skill 根目录（脚本位于 validate/ 下）
+const SKILL_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
+// 校验通过后的最终数据目录
+const DATA_DIR = path.join(SKILL_ROOT, 'render', 'data')
 
 const ASSOCIATED_TYPES = ['call', 'return', 'indirect', null]
 
@@ -165,27 +179,13 @@ export function validateData(data) {
     }
   })
 
-  // ---- 全局校验：id 唯一 + 从 '1' 连续递增 ----
+  // ---- 全局校验：id 唯一 ----
   const idSet = new Set(ids)
   if (idSet.size !== ids.length) {
     const seen = new Set()
     for (const id of ids) {
       if (seen.has(id)) errors.push(`id 重复："${id}"`)
       seen.add(id)
-    }
-  }
-
-  const total = data.nodes.length
-  for (let i = 1; i <= total; i++) {
-    if (!idSet.has(String(i))) errors.push(`id 必须从 '1' 连续递增，缺少 id "${i}"`)
-  }
-
-  for (const id of ids) {
-    if (!/^\d+$/.test(id)) {
-      errors.push(`id 必须是纯数字字符串，实际："${id}"`)
-    } else {
-      const num = Number(id)
-      if (num < 1 || num > total) errors.push(`id "${id}" 超出范围（应为 1~${total}）`)
     }
   }
 
@@ -203,14 +203,39 @@ export function validateData(data) {
   return errors
 }
 
+// ---- 发布（校验通过后移动并清理）----
+
+function publishFile(filePath) {
+  const source = path.resolve(filePath)
+  if (!existsSync(source)) fail(`待发布文件不存在：${source}`)
+
+  const target = path.join(DATA_DIR, path.basename(filePath))
+  // 覆盖同名目标文件（Windows 上 rename 覆盖已存在文件可能失败，先删除）
+  if (existsSync(target)) rmSync(target, { force: true })
+  renameSync(source, target)
+  log(`已发布：${target}`)
+
+  // 源目录若已空则清理（仅用于 .cache 临时目录；非空则忽略）
+  const srcDir = path.dirname(source)
+  try {
+    rmdirSync(srcDir)
+    log(`已清理空目录：${srcDir}`)
+  } catch {
+    // 目录非空或不存在，忽略
+  }
+}
+
 // ---- 入口 ----
 
 function main() {
   const argv = process.argv.slice(2)
   if (argv.includes('--help') || argv.includes('-h')) {
-    console.log('用法：node validate/validate.mjs <path/to/data.json>')
+    console.log('用法：node validate/validate.mjs <path/to/data.json> [--publish]')
+    console.log('  --publish  校验通过后将数据文件发布到 render/data/，并清理空的 .cache 目录')
     process.exit(0)
   }
+
+  const publish = argv.includes('--publish')
 
   // 仅接受以 .json 结尾的参数作为数据文件路径，
   // 忽略 node / 脚本路径等非目标参数，避免命令被重复拼接时误判。
@@ -245,6 +270,7 @@ function main() {
   }
 
   log(`校验通过：${filePath}`)
+  if (publish) publishFile(filePath)
   process.exit(0)
 }
 

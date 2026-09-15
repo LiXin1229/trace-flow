@@ -130,21 +130,16 @@ describe('validateData', () => {
     expect(validateData(data).some((e) => e.includes('.id 必须是非空字符串'))).toBe(true)
   })
 
-  it('id 必须从 1 连续递增（缺号 / 超范围 / 重复）', () => {
-    let data = {
-      projectRoot,
-      nodes: [makeNode({ id: '1' }), makeNode({ id: '3' })]
-    }
-    let errors = validateData(data)
-    expect(errors.some((e) => e.includes('缺少 id "2"'))).toBe(true)
-    expect(errors.some((e) => e.includes('超出范围'))).toBe(true)
+  it('id 允许任意非空字符串，但必须唯一', () => {
+    // 非数字字符串 id 也合法
+    expect(validateData({ projectRoot, nodes: [makeNode({ id: 'foo' })] })).toEqual([])
 
-    data = {
+    // 重复 id 报错
+    const data = {
       projectRoot,
       nodes: [makeNode({ id: '1' }), makeNode({ id: '1' })]
     }
-    errors = validateData(data)
-    expect(errors.some((e) => e.includes('id 重复'))).toBe(true)
+    expect(validateData(data).some((e) => e.includes('id 重复'))).toBe(true)
   })
 
   it('filepath 不能是绝对路径', () => {

@@ -1,6 +1,9 @@
 node_modules
 *.local
 
+# 校验通过前用于暂存 JSON 数据的临时目录
+.cache
+
 # dist 为预构建的静态产物，随仓库分发：
 # skill 使用者无需安装 node_modules / 构建即可通过 scripts/serve.mjs 运行渲染器
 # 渲染器代码更新后，开发者需执行 npm run build 并提交新的 dist
