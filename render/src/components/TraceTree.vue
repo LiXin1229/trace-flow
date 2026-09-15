@@ -125,12 +125,13 @@ const props = defineProps({
   hideNonRequired: { type: Boolean, default: false }
 })
 
-const emit = defineEmits(['select', 'deselect'])
+const emit = defineEmits(['select'])
 
 const canvasEl = ref(null)
 const overrides = reactive({}) // 实例路径 -> 手动覆盖的展开状态
 const mode = ref('default') // default: 深度<3 展开 | all | roots
 const dismissed = reactive({}) // 手动关闭的 keyVariables 气泡
+const selectedKey = ref(null) // 当前点击节点实例的 key（id 可能重复，用 key 精确定位）
 const view = reactive({ x: 0, y: 0, k: 1 })
 let movedFar = false
 let drag = null
@@ -160,12 +161,11 @@ const edgeViews = computed(() =>
 
 const bubbleItems = computed(() => {
   if (!props.graph) return []
-  if (props.selectedId == null) return []
-  const ids = new Set([String(props.selectedId)])
+  if (selectedKey.value == null) return []
 
   const out = []
   for (const n of layout.value.nodes) {
-    if (!ids.has(n.id)) continue
+    if (n.key !== selectedKey.value) continue
     const vars =
       n.node && Array.isArray(n.node.keyVariables)
         ? n.node.keyVariables.filter((v) => v && v.name)
@@ -176,7 +176,6 @@ const bubbleItems = computed(() => {
     const above = n.y > belowSpace
     out.push({
       key: n.key,
-      id: n.id,
       x: n.x,
       top: above ? n.y - 10 : n.y + NODE_H + 10,
       above,
@@ -219,6 +218,7 @@ function isEdgeSelected(e) {
 }
 
 function selectNode(n) {
+  selectedKey.value = n.key
   delete dismissed[n.key]
   emit('select', n.id)
 }
@@ -356,6 +356,7 @@ function reveal(id) {
     const n = layout.value.nodes.find((x) => x.id === target)
     const el = canvasEl.value
     if (n && el) {
+      selectedKey.value = n.key
       view.k = Math.max(view.k, 0.7)
       view.x = el.clientWidth / 2 - (n.x + NODE_W / 2) * view.k
       view.y = el.clientHeight / 2 - (n.y + NODE_H / 2) * view.k
@@ -372,8 +373,9 @@ function shortFile(fp) {
 
 watch(
   () => props.selectedId,
-  () => {
+  (val) => {
     for (const k of Object.keys(dismissed)) delete dismissed[k]
+    if (val == null) selectedKey.value = null
   }
 )
 
