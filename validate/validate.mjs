@@ -177,6 +177,35 @@ export function validateData(data) {
         }
       })
     }
+
+    // keyVariables（可选字段）
+    if ('keyVariables' in node) {
+      if (!Array.isArray(node.keyVariables)) {
+        errors.push(`${where}.keyVariables 必须是数组`)
+      } else {
+        node.keyVariables.forEach((kv, kvIdx) => {
+          const w = `${where}.keyVariables[${kvIdx}]`
+          if (kv === null || typeof kv !== 'object' || Array.isArray(kv)) {
+            errors.push(`${w} 必须是对象`)
+            return
+          }
+
+          for (const key of ['name', 'type', 'description']) {
+            if (!(key in kv)) errors.push(`${w} 缺少必需字段 "${key}"`)
+          }
+
+          if (!isNonEmptyString(kv.name)) {
+            errors.push(`${w}.name 必须是非空字符串`)
+          }
+          if (!isNonEmptyString(kv.type)) {
+            errors.push(`${w}.type 必须是非空字符串`)
+          }
+          if (!isNonEmptyString(kv.description)) {
+            errors.push(`${w}.description 必须是非空字符串`)
+          }
+        })
+      }
+    }
   })
 
   // ---- 全局校验：id 唯一 ----

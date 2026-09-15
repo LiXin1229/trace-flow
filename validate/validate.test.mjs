@@ -35,6 +35,15 @@ function makeSnippet(overrides = {}) {
   }
 }
 
+function makeKeyVariable(overrides = {}) {
+  return {
+    name: 'res',
+    type: 'object',
+    description: '接口响应数据',
+    ...overrides
+  }
+}
+
 describe('isNonEmptyString', () => {
   it('正常字符串返回 true', () => {
     expect(isNonEmptyString('abc')).toBe(true)
@@ -208,5 +217,68 @@ describe('validateData', () => {
       nodes: [makeNode({ id: '1', snippetIntents: [makeSnippet({ associatedId: '99', associatedType: 'call' })] })]
     }
     expect(validateData(data).some((e) => e.includes('引用了不存在的 id "99"'))).toBe(true)
+  })
+
+  it('keyVariables 可选，缺失时不报错', () => {
+    const data = { projectRoot, nodes: [makeNode()] }
+    expect(validateData(data)).toEqual([])
+  })
+
+  it('keyVariables 合法时返回空错误列表', () => {
+    const data = {
+      projectRoot,
+      nodes: [makeNode({ keyVariables: [makeKeyVariable()] })]
+    }
+    expect(validateData(data)).toEqual([])
+  })
+
+  it('keyVariables 必须是数组', () => {
+    const data = { projectRoot, nodes: [makeNode({ keyVariables: 'x' })] }
+    expect(validateData(data).some((e) => e.includes('keyVariables 必须是数组'))).toBe(true)
+  })
+
+  it('keyVariables 元素必须是对象', () => {
+    const data = { projectRoot, nodes: [makeNode({ keyVariables: ['x'] })] }
+    expect(validateData(data).some((e) => e.includes('keyVariables[0] 必须是对象'))).toBe(true)
+  })
+
+  it('keyVariables 元素缺少必需字段时报错', () => {
+    const data = { projectRoot, nodes: [makeNode({ keyVariables: [{ name: 'res' }] })] }
+    expect(validateData(data).some((e) => e.includes('缺少必需字段'))).toBe(true)
+  })
+
+  it('keyVariables 的 name/type/description 必须是非空字符串', () => {
+    expect(
+      validateData({
+        projectRoot,
+        nodes: [makeNode({ keyVariables: [makeKeyVariable({ name: '' })] })]
+      }).some((e) => e.includes('.name 必须是非空字符串'))
+    ).toBe(true)
+
+    expect(
+      validateData({
+        projectRoot,
+        nodes: [makeNode({ keyVariables: [makeKeyVariable({ type: 1 })] })]
+      }).some((e) => e.includes('.type 必须是非空字符串'))
+    ).toBe(true)
+
+    expect(
+      validateData({
+        projectRoot,
+        nodes: [makeNode({ keyVariables: [makeKeyVariable({ description: '   ' })] })]
+      }).some((e) => e.includes('.description 必须是非空字符串'))
+    ).toBe(true)
+  })
+
+  it('keyVariables 允许重复 name（不校验唯一）', () => {
+    const data = {
+      projectRoot,
+      nodes: [
+        makeNode({
+          keyVariables: [makeKeyVariable({ name: 'res' }), makeKeyVariable({ name: 'res' })]
+        })
+      ]
+    }
+    expect(validateData(data)).toEqual([])
   })
 })

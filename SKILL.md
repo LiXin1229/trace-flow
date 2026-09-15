@@ -35,6 +35,13 @@ description: "分析某个功能的完整代码逻辑与调用链路，输出结
           "associatedType": "<关联的函数的方式, 可选值为 'call' | 'return' | 'indirect' | null>",
           "associatedRequired": "<是否和该功能强相关，可选值为 true | false>"
         }
+      ],
+      "keyVariables": [
+        {
+          "name": "<函数或方法中使用的变量名>",
+          "type": "<变量类型>",
+          "description": "<变量的作用/内容>"
+        }
       ]
     }
   ]
@@ -53,6 +60,9 @@ description: "分析某个功能的完整代码逻辑与调用链路，输出结
 - `associatedRequired`：
   - `true`：该关联与功能核心逻辑强相关
   - `false`：辅助性代码（打日志、鉴权、参数校验等对理解核心功能无益），且无关联函数时为 `false`（`associatedId` 为 `null` 则 `associatedRequired` 必须为 `false`）
+- `keyVariables`：不是每个 node 都有，可以为空数组，只是在分析时识别出的、对理解功能核心逻辑有帮助的变量。该函数/方法内使用到的关键变量数组，每个元素包含：
+  - `name`：变量名，如 `res`、`data` 等
+  - `type`：变量类型，如 `string`、`number`、`HomeworkDetail`（ts类型）、`int`（python类型） 等
 
 ### 分析风格
 
@@ -72,6 +82,19 @@ chalk('hello', 'world');     // => 'hello world'
 3. **请求链路**：如果遇到请求方法且前后端项目都可见，则根据请求路径继续分析后端上游/下游。
 4. **完整覆盖**：务必梳理出该功能的所有调用链路，不能遗漏。可结合 IDE 的引用查找与搜索功能辅助分析。
 5. **逐轮推进**：调用链可能较长，不要一次性全部分析。每轮只针对一个函数/方法，边分析边把下游相关函数及位置收集进待分析数组，不断填充 JSON 结果数组，直到清空数组、完整梳理出该功能流程后再进行渲染。
+
+## 分析关键变量
+
+默认情况下，再生成 JSON 后、校验 JSON 前，需再补充一轮分析，为部分 node 填充 `keyVariables` 字段：
+
+1. **按需梳理关键变量**：不是每个 node 都要填充 `keyVariables`。仅当函数/方法内存在对理解核心逻辑有帮助的变量时才进行分析，无关键变量的 node 可跳过（`keyVariables` 设为空数组）。
+2. **记录变量信息**：每个变量按如下结构填写：
+   - `name`：变量名，如 `res`、`data` 等
+   - `type`：变量类型，如 `string`、`number`、`HomeworkDetail`（ts类型）、`int`（python类型）等
+   - `description`：变量的作用/内容
+3. **只保留关键变量**：辅助性、无关紧要的局部变量（如临时计数、无关日志变量等）可省略。
+
+如果用户说明无需分析关键变量，直接跳过该步骤。
 
 ## 校验数据
 
