@@ -45,7 +45,7 @@
           class="node-card"
           :class="nodeClass(n)"
           :style="{ left: n.x + 'px', top: n.y + 'px' }"
-          @click.stop="$emit('select', n.id)"
+          @click.stop="selectNode(n)"
         >
           <div class="node-head">
             <span class="node-id mono" title="id: {{ n.id }}">#{{ n.id }}</span>
@@ -69,6 +69,28 @@
           >
             {{ n.expanded ? '−' : n.childCount }}
           </button>
+        </div>
+
+        <div
+          v-for="b in bubbleItems"
+          :key="'kv-' + b.key"
+          class="kv-bubble"
+          :class="{ above: b.above }"
+          :style="{ left: b.x + 'px', top: b.top + 'px' }"
+        >
+          <div class="kv-head">
+            <span>关键变量</span>
+            <button class="kv-close" title="关闭" @click.stop="closeBubble(b)">×</button>
+          </div>
+          <ul class="kv-list">
+            <li v-for="(v, i) in b.vars" :key="i" class="kv-item">
+              <div class="kv-name mono">
+                {{ v.name }}
+                <span v-if="v.type" class="kv-type">{{ v.type }}</span>
+              </div>
+              <div v-if="v.description" class="kv-desc">{{ v.description }}</div>
+            </li>
+          </ul>
         </div>
       </div>
     </div>
@@ -103,11 +125,12 @@ const props = defineProps({
   hideNonRequired: { type: Boolean, default: false }
 })
 
-const emit = defineEmits(['select'])
+const emit = defineEmits(['select', 'deselect'])
 
 const canvasEl = ref(null)
 const overrides = reactive({}) // 实例路径 -> 手动覆盖的展开状态
 const mode = ref('default') // default: 深度<3 展开 | all | roots
+const dismissed = reactive({}) // 手动关闭的 keyVariables 气泡
 const view = reactive({ x: 0, y: 0, k: 1 })
 let movedFar = false
 let drag = null
@@ -134,6 +157,34 @@ const edgeViews = computed(() =>
       `${TYPE_LABELS[e.type] || '关联'} · ${e.required ? '核心链路' : '非核心'} · ${e.count} 处调用`
   }))
 )
+
+const bubbleItems = computed(() => {
+  if (!props.graph) return []
+  if (props.selectedId == null) return []
+  const ids = new Set([String(props.selectedId)])
+
+  const out = []
+  for (const n of layout.value.nodes) {
+    if (!ids.has(n.id)) continue
+    const vars =
+      n.node && Array.isArray(n.node.keyVariables)
+        ? n.node.keyVariables.filter((v) => v && v.name)
+        : []
+    if (!vars.length) continue
+    if (dismissed[n.key]) continue
+    const belowSpace = layout.value.height - (n.y + NODE_H)
+    const above = n.y > belowSpace
+    out.push({
+      key: n.key,
+      id: n.id,
+      x: n.x,
+      top: above ? n.y - 10 : n.y + NODE_H + 10,
+      above,
+      vars
+    })
+  }
+  return out
+})
 
 const worldStyle = computed(() => ({
   width: layout.value.width + 'px',
@@ -165,6 +216,15 @@ function nodeClass(n) {
 
 function isEdgeSelected(e) {
   return !!props.selectedId && (e.fromId === props.selectedId || e.toId === props.selectedId)
+}
+
+function selectNode(n) {
+  delete dismissed[n.key]
+  emit('select', n.id)
+}
+
+function closeBubble(b) {
+  dismissed[b.key] = true
 }
 
 /* ---------- 折叠控制 ---------- */
@@ -309,6 +369,13 @@ function shortFile(fp) {
   const parts = String(fp).split('/')
   return parts.slice(-2).join('/')
 }
+
+watch(
+  () => props.selectedId,
+  () => {
+    for (const k of Object.keys(dismissed)) delete dismissed[k]
+  }
+)
 
 watch(
   () => props.graph,
@@ -518,6 +585,90 @@ defineExpose({ reveal, fitView })
   color: var(--text);
   border-color: var(--accent);
   box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.15);
+}
+
+/* ---------- keyVariables 气泡 ---------- */
+.kv-bubble {
+  position: absolute;
+  width: 300px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: linear-gradient(180deg, #1a2029, #141922);
+  /* box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.15), 0 6px 18px rgba(1, 4, 9, 0.6); */
+  z-index: 20;
+  pointer-events: none;
+}
+
+.kv-bubble.above {
+  transform: translateY(-100%);
+}
+
+.kv-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent);
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.kv-close {
+  border: none;
+  background: none;
+  color: var(--text-faint);
+  font-size: 16px;
+  line-height: 1;
+  padding: 0 2px;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.kv-close:hover {
+  color: var(--text);
+}
+
+.kv-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 220px;
+  overflow: auto;
+}
+
+.kv-item {
+  padding: 6px 8px;
+  background: rgba(33, 38, 45, 0.6);
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+}
+
+.kv-name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text);
+}
+
+.kv-type {
+  font-size: 10px;
+  color: var(--gold);
+  background: rgba(227, 179, 65, 0.12);
+  border: 1px solid rgba(227, 179, 65, 0.35);
+  border-radius: 999px;
+  padding: 0 6px;
+  white-space: nowrap;
+}
+
+.kv-desc {
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--text-dim);
+  margin-top: 3px;
 }
 
 /* ---------- 工具条 ---------- */

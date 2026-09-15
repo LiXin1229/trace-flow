@@ -4,27 +4,27 @@
     {
       "id": "1",
       "name": "init",
-      "filepath": "examples/frontend/detail.js",
-      "line": "#L19-L30",
+      "filepath": "examples/frontend/detail.ts",
+      "line": "#L31-L42",
       "oneLineSummary": "详情页初始化入口：调用 loadDetail 加载作业详情，加载失败时通过 showMsg 展示错误提示",
       "snippetIntents": [
         {
           "content": "调用 loadDetail 加载作业详情数据（请求详情接口并渲染统计信息）",
-          "line": "#L21",
+          "line": "#L33",
           "associatedId": "2",
           "associatedType": "call",
           "associatedRequired": true
         },
         {
           "content": "加载成功后（模块级标记 detailLoaded 为 true）直接返回，结束初始化流程",
-          "line": "#L22",
+          "line": "#L34",
           "associatedId": null,
           "associatedType": null,
           "associatedRequired": false
         },
         {
           "content": "异常兜底：调用 showMsg 在提示区展示错误信息（优先 err.message，否则提示「加载失败，请确认后端已启动后刷新重试」）",
-          "line": "#L24-L28",
+          "line": "#L35-L40",
           "associatedId": "3",
           "associatedType": "call",
           "associatedRequired": false
@@ -41,34 +41,34 @@
     {
       "id": "2",
       "name": "loadDetail",
-      "filepath": "examples/frontend/detail.js",
-      "line": "#L6-L17",
+      "filepath": "examples/frontend/detail.ts",
+      "line": "#L11-L29",
       "oneLineSummary": "加载作业详情：请求详情接口，失败时提示错误，成功后标记加载完成并渲染统计信息",
       "snippetIntents": [
         {
           "content": "调用 apiRequest 请求 GET /api/homework/detail?homework_id=... 获取作业详情，并使用返回的 res",
-          "line": "#L7",
+          "line": "#L12-L14",
           "associatedId": "4",
           "associatedType": "return",
           "associatedRequired": true
         },
         {
           "content": "非 200 时调用 showMsg 展示后端返回的错误信息并直接返回",
-          "line": "#L8-L11",
+          "line": "#L16-L19",
           "associatedId": "3",
           "associatedType": "call",
           "associatedRequired": false
         },
         {
           "content": "设置模块级标记 detailLoaded = true，表示详情加载成功",
-          "line": "#L13",
+          "line": "#L21",
           "associatedId": null,
           "associatedType": null,
           "associatedRequired": false
         },
         {
           "content": "将统计信息渲染到 statsText（总题数 / 对 / 半对 / 错），比如作业共 5 题、对 3、半对 1、错 1 时：\n\nstatsText.textContent = '共 5 题 · 对 3 · 半对 1 · 错 1'",
-          "line": "#L15-L16",
+          "line": "#L23-L28",
           "associatedId": null,
           "associatedType": null,
           "associatedRequired": false
@@ -95,20 +95,20 @@
     {
       "id": "3",
       "name": "showMsg",
-      "filepath": "examples/frontend/ui.js",
-      "line": "#L1-L4",
+      "filepath": "examples/frontend/ui.ts",
+      "line": "#L3-L12",
       "oneLineSummary": "通用的提示消息展示函数：设置提示元素文本并按类型设置样式类",
       "snippetIntents": [
         {
           "content": "设置提示元素的文本内容",
-          "line": "#L2",
+          "line": "#L9",
           "associatedId": null,
           "associatedType": null,
           "associatedRequired": false
         },
         {
           "content": "根据类型（error/success 等）拼接样式类名并赋给元素，比如：\n\nshowMsg(el, '加载失败', 'error');\n// el.textContent === '加载失败'\n// el.className === 'msg error'",
-          "line": "#L3",
+          "line": "#L10",
           "associatedId": null,
           "associatedType": null,
           "associatedRequired": false
@@ -119,34 +119,34 @@
     {
       "id": "4",
       "name": "apiRequest",
-      "filepath": "examples/frontend/http.js",
-      "line": "#L3-L23",
+      "filepath": "examples/frontend/http.ts",
+      "line": "#L5-L29",
       "oneLineSummary": "通用请求封装：合并请求头并发送 fetch，解析 JSON 响应后返回，连接失败或响应异常时抛出错误",
       "snippetIntents": [
         {
           "content": "合并传入的请求头，若未指定 Content-Type 且 body 非 FormData，则默认设为 application/json，比如：\n\napiRequest('/api/homework/detail?homework_id=1');\n// 实际发送的 headers: { 'Content-Type': 'application/json' }",
-          "line": "#L4-L7",
+          "line": "#L9-L12",
           "associatedId": null,
           "associatedType": null,
           "associatedRequired": false
         },
         {
           "content": "调用 fetch 发送请求（路径为 API_BASE + path），间接触发后端 GET /api/homework/detail 路由；连接失败时抛出「无法连接后端服务」错误",
-          "line": "#L9-L14",
+          "line": "#L14-L19",
           "associatedId": "5",
           "associatedType": "indirect",
           "associatedRequired": true
         },
         {
           "content": "解析响应 JSON，解析失败时抛出「服务器响应异常」错误",
-          "line": "#L15-L20",
+          "line": "#L21-L26",
           "associatedId": null,
           "associatedType": null,
           "associatedRequired": false
         },
         {
           "content": "返回解析后的 JSON 数据",
-          "line": "#L22",
+          "line": "#L28",
           "associatedId": null,
           "associatedType": null,
           "associatedRequired": false
