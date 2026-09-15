@@ -219,7 +219,6 @@ watch(graph, () => {
 
 function onSelect(id) {
   selectedId.value = String(id)
-  panelHidden.value = false
 }
 
 function onJump(id) {
